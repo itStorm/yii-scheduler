@@ -109,7 +109,7 @@ class Scheduler extends \CApplicationComponent
                                 $months = null)
     {
         $className = $this->taskClass;
-        $className::drop(
+        return $className::drop(
             get_class($object),
             $object->getIdentify(),
             $action,
