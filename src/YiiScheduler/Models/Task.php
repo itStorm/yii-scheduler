@@ -94,9 +94,8 @@ class Task extends \CActiveRecord implements TaskInterface
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function validateDays($attribute, $params)
+    public function validateDays($attribute)
     {
         $days = $this->getDays();
         if (!$days) {
@@ -106,7 +105,7 @@ class Task extends \CActiveRecord implements TaskInterface
         }
 
         foreach ($days as $day) {
-            if (!in_array($day, DateTimeRepresent::DAYS)) {
+            if (!in_array($day, DateTimeRepresent::getDays())) {
                 $this->addError($attribute, 'Not valid');
 
                 return;
@@ -116,9 +115,8 @@ class Task extends \CActiveRecord implements TaskInterface
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function validateWeekDays($attribute, $params)
+    public function validateWeekDays($attribute)
     {
         $weekDays = $this->getWeekDays();
         if (!$weekDays) {
@@ -128,7 +126,7 @@ class Task extends \CActiveRecord implements TaskInterface
         }
 
         foreach ($weekDays as $weekDay) {
-            if (!in_array($weekDay, DateTimeRepresent::WEEK_DAYS_NAMES)) {
+            if (!in_array($weekDay, DateTimeRepresent::getWeekDaysNames())) {
                 $this->addError($attribute, 'Not valid');
 
                 return;
@@ -138,9 +136,8 @@ class Task extends \CActiveRecord implements TaskInterface
 
     /**
      * @param string $attribute
-     * @param array $params
      */
-    public function validateMonths($attribute, $params)
+    public function validateMonths($attribute)
     {
         $months = $this->getMonths();
         if (!$months) {
@@ -150,7 +147,7 @@ class Task extends \CActiveRecord implements TaskInterface
         }
 
         foreach ($months as $month) {
-            if (!in_array($month, DateTimeRepresent::MONTHS_NAMES)) {
+            if (!in_array($month, DateTimeRepresent::getMonthsNames())) {
                 $this->addError($attribute, 'Not valid');
 
                 return;
@@ -225,7 +222,7 @@ class Task extends \CActiveRecord implements TaskInterface
         if (is_array($days)) {
             $this->humanReadableDays = $days;
         } elseif ($days === '*') {
-            $this->humanReadableDays = DateTimeRepresent::DAYS;
+            $this->humanReadableDays = DateTimeRepresent::getDays();
         } else {
             $this->humanReadableDays = [$days];
         }
@@ -249,7 +246,7 @@ class Task extends \CActiveRecord implements TaskInterface
         if (is_array($weekDays)) {
             $this->humanReadableWeekDays = $weekDays;
         } elseif ($weekDays === '*') {
-            $this->humanReadableWeekDays = DateTimeRepresent::WEEK_DAYS_NAMES;
+            $this->humanReadableWeekDays = DateTimeRepresent::getWeekDaysNames();
         } else {
             $this->humanReadableWeekDays = [$weekDays];
         }
@@ -273,7 +270,7 @@ class Task extends \CActiveRecord implements TaskInterface
         if (is_array($months)) {
             $this->humanReadableMonths = $months;
         } elseif ($months === '*') {
-            $this->humanReadableMonths = DateTimeRepresent::MONTHS_NAMES;
+            $this->humanReadableMonths = DateTimeRepresent::getMonthsNames();
         } else {
             $this->humanReadableMonths = [$months];
         }
@@ -371,10 +368,12 @@ class Task extends \CActiveRecord implements TaskInterface
     {
         $className = '\\' . $this->getSubject();
         /** @var ScheduleCallableInterface $object */
-        $object = new $className;
+        $object = $className::loadByIdentify($this->getIdentify());
+        if (!$object) {
+            $this->delete();
 
-
-        $object->loadByIdentify($this->getIdentify());
+            return;
+        }
 
         $method = new \ReflectionMethod($object, $this->getAction());
         $method->invokeArgs($object, $this->getScope());
@@ -429,12 +428,12 @@ class Task extends \CActiveRecord implements TaskInterface
         $currentTimesInSecond = DateTimeRepresent::timeToSeconds(gmdate('H:i:s', $timestamp));
 
         $day = gmdate('j', $timestamp);
-        $weekDay = DateTimeRepresent::COMPARE_WEEK_DAYS_INDEXES[gmdate('N', $timestamp)];
-        $month = DateTimeRepresent::COMPARE_MONTHS_INDEXES[gmdate('n', $timestamp)];
+        $weekDay = DateTimeRepresent::getCompareListWeekDaysVsIndexes()[gmdate('N', $timestamp)];
+        $month = DateTimeRepresent::getCompareListMonthsVsIndexes()[gmdate('n', $timestamp)];
 
-        $dayAsBinaryValue = DateTimeRepresent::COMPARE_DAYS_BINARY_VALUES[$day];
-        $weekDayAsBinaryValue = DateTimeRepresent::COMPARE_WEEK_DAYS_BINARY_VALUES[$weekDay];
-        $monthAsBinaryValue = DateTimeRepresent::COMPARE_MONTHS_BINARY_VALUES[$month];
+        $dayAsBinaryValue = DateTimeRepresent::getCompareListDaysVsBinaryValues()[$day];
+        $weekDayAsBinaryValue = DateTimeRepresent::getCompareListWeekDaysVsBinaryValues()[$weekDay];
+        $monthAsBinaryValue = DateTimeRepresent::getCompareListMonthsVsBinaryValues()[$month];
 
         $findCondition = "      time <= {$currentTimesInSecond}
                             AND days&{$dayAsBinaryValue}
@@ -445,7 +444,9 @@ class Task extends \CActiveRecord implements TaskInterface
 
         $sql = <<<SQL
 SELECT * FROM {$table}
-WHERE  {$findCondition} {$limit}
+WHERE  {$findCondition}
+ORDER BY time ASC
+{$limit}
 FOR UPDATE
 SQL;
 

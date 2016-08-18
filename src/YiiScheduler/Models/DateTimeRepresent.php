@@ -9,12 +9,12 @@ class DateTimeRepresent
 {
     const SECONDS_IN_DAY = 86399;
 
-    const DAYS = [
+    protected static $days = [
         1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
         18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
     ];
 
-    const COMPARE_DAYS_BINARY_VALUES = [
+    protected static $compareListDaysVsBinaryValues = [
         1  => 1,
         2  => 2,
         3  => 4,
@@ -50,11 +50,11 @@ class DateTimeRepresent
 
     const ALL_DAYS_AS_BINARY_VALUE = 2147483647;
 
-    const WEEK_DAYS_NAMES = [
+    protected static $weekDaysNames = [
         'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
     ];
 
-    const COMPARE_WEEK_DAYS_INDEXES = [
+    protected static $compareListWeekDaysVsIndexes = [
         1 => 'monday',
         2 => 'tuesday',
         3 => 'wednesday',
@@ -64,7 +64,7 @@ class DateTimeRepresent
         7 => 'sunday',
     ];
 
-    const COMPARE_WEEK_DAYS_BINARY_VALUES = [
+    protected static $compareListWeekDaysVsBinaryValues = [
         'monday'    => 1,
         'tuesday'   => 2,
         'wednesday' => 4,
@@ -76,12 +76,12 @@ class DateTimeRepresent
 
     const ALL_WEEK_DAYS_BINARY_VALUE = 127;
 
-    const MONTHS_NAMES = [
+    protected static $monthsNames = [
         'january', 'february', 'march', 'april', 'may', 'june',
         'july', 'august', 'september', 'october', 'november', 'december',
     ];
 
-    const COMPARE_MONTHS_INDEXES = [
+    protected static $compareListMonthsVsIndexes = [
         1  => 'january',
         2  => 'february',
         3  => 'march',
@@ -96,7 +96,7 @@ class DateTimeRepresent
         12 => 'december',
     ];
 
-    const COMPARE_MONTHS_BINARY_VALUES = [
+    protected static $compareListMonthsVsBinaryValues = [
         'january'   => 1,
         'february'  => 2,
         'march'     => 4,
@@ -112,6 +112,67 @@ class DateTimeRepresent
     ];
 
     const ALL_MONTHS_BINARY_VALUE = 4095;
+
+    /**
+     * @return array
+     */
+    public static function getDays()
+    {
+        return static::$days;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCompareListDaysVsBinaryValues()
+    {
+        return static::$compareListDaysVsBinaryValues;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getWeekDaysNames()
+    {
+        return static::$weekDaysNames;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCompareListWeekDaysVsIndexes()
+    {
+        return static::$compareListWeekDaysVsIndexes;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCompareListWeekDaysVsBinaryValues()
+    {
+        return static::$compareListWeekDaysVsBinaryValues;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getMonthsNames() {
+       return static::$monthsNames;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCompareListMonthsVsIndexes() {
+        return static::$compareListMonthsVsIndexes;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getCompareListMonthsVsBinaryValues() {
+        return static::$compareListMonthsVsBinaryValues;
+    }
 
     /**
      * @param mixed $days
@@ -131,8 +192,8 @@ class DateTimeRepresent
         }
 
         foreach ($days as $day) {
-            if (!empty(self::COMPARE_DAYS_BINARY_VALUES[$day])) {
-                $daysAsInt += self::COMPARE_DAYS_BINARY_VALUES[$day];
+            if (!empty(self::getCompareListDaysVsBinaryValues()[$day])) {
+                $daysAsInt += self::getCompareListDaysVsBinaryValues()[$day];
             }
         }
 
@@ -157,8 +218,8 @@ class DateTimeRepresent
         }
 
         foreach ($weekDays as $weekDay) {
-            if (!empty(self::COMPARE_WEEK_DAYS_BINARY_VALUES[$weekDay])) {
-                $weekDaysAsInt += self::COMPARE_WEEK_DAYS_BINARY_VALUES[$weekDay];
+            if (!empty(self::getCompareListWeekDaysVsBinaryValues()[$weekDay])) {
+                $weekDaysAsInt += self::getCompareListWeekDaysVsBinaryValues()[$weekDay];
             }
         }
 
@@ -183,8 +244,8 @@ class DateTimeRepresent
         }
 
         foreach ($months as $month) {
-            if (!empty(self::COMPARE_MONTHS_BINARY_VALUES[$month])) {
-                $monthsAsInt += self::COMPARE_MONTHS_BINARY_VALUES[$month];
+            if (!empty(self::getCompareListMonthsVsBinaryValues()[$month])) {
+                $monthsAsInt += self::getCompareListMonthsVsBinaryValues()[$month];
             }
         }
 

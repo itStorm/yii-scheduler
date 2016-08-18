@@ -14,7 +14,7 @@ interface ScheduleCallableInterface
 
     /**
      * @param $identify
-     * @return $this
+     * @return self|null
      */
-    public function loadByIdentify($identify);
+    public static function loadByIdentify($identify);
 }
